@@ -15,6 +15,8 @@ The controls also work by click or tap.
 
 The current catalog includes a hand-reviewed selection of finished memes from [Dank Meme Paradise](https://github.com/Silent-dawn/Dank_Meme_Paradise), [SeansLifeArchive Images Memes](https://github.com/seanpm2001/SeansLifeArchive_Images_Memes), and [programming-memes](https://github.com/dpnkrpl/programming-memes).
 
+The expanded batch restores captions from published posts in the [ImgFlip575K archive](https://github.com/schesa/ImgFlip575K_Dataset) on their corresponding templates. Each restored entry keeps the original post URL. The batch was ranked by votes, screened with template and caption filters, deduplicated, and spot-checked visually.
+
 ## Run locally
 
 Requires Node.js 24 or later.

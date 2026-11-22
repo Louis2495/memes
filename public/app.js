@@ -30,7 +30,7 @@ function render(message) {
   caption.textContent = current?.title ?? '';
   if (current) {
     const image = element('meme');
-    image.alt = current.title;
+    image.alt = current.alt ?? current.title;
     const source = staticHost ? new URL(`memes/${current.image}`, import.meta.url).href : `/api/memes/${current.id}/image`;
     if (image.getAttribute('src') !== source) image.src = source;
   } else {
@@ -135,7 +135,7 @@ async function init() {
       return;
     }
 
-    const catalog = await request(new URL('memes/catalog.json?v=8', import.meta.url), { cache: 'no-cache' });
+    const catalog = await request(new URL('memes/catalog.json?v=9', import.meta.url), { cache: 'no-cache' });
     memes = view === 'good' ? catalog.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like') : catalog;
     render();
     return;
