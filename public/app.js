@@ -18,8 +18,6 @@ async function request(path, options) {
 
 function render(message) {
   const current = memes[index];
-  const preview = element('pages-preview');
-  if (preview) preview.hidden = true;
   const good = view === 'good';
   element('position').textContent = current ? `${index + 1} / ${memes.length}` : '— / —';
   element('empty').hidden = Boolean(current);
@@ -129,12 +127,13 @@ async function init() {
     } else {
       if (view === 'feed') {
         try {
-          memes = await request(new URL('memes/catalog.json?v=2', import.meta.url), { cache: 'no-cache' });
+          memes = await request(new URL('memes/catalog.json?v=3', import.meta.url), { cache: 'no-cache' });
         } catch {
-          element('status').textContent = 'Could not load the full feed. Refresh to retry.';
+          element('empty-title').textContent = 'Could not load the feed';
+          element('empty-description').textContent = 'Refresh to retry.';
           return;
         }
-        element('status').textContent = 'Voting is available on the hosted Meme Room app.';
+        if (memes.length) element('status').textContent = 'Voting is available on the hosted Meme Room app.';
       }
       render(view === 'good' ? 'Saved likes are available on the hosted Meme Room app.' : undefined);
       element('empty-action').hidden = true;

@@ -1,6 +1,6 @@
 # Meme Room
 
-A web-only meme feed. The starter library contains original text memes about fiscal restraint, bureaucracy, and self-reliance. The starter batch uses original captions and artwork with no third-party meme material. Visitors can browse the feed. Signed-in users can like or dislike a meme, and Good shows the current user's likes. A dislike from the verified Google account `louisanderson477@gmail.com` deletes the meme, its image, and related votes from the shared SQLite database.
+A web-only meme feed. The feed is reserved for captioned pictures. The catalog is currently empty. Visitors can browse the feed. Signed-in users can like or dislike a meme, and Good shows the current user's likes. A dislike from the verified Google account `louisanderson477@gmail.com` deletes the meme, its image, and related votes from the shared SQLite database.
 
 | Key | Action |
 | --- | --- |
