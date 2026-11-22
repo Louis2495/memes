@@ -29,7 +29,17 @@ npm test
 
 Open `http://localhost:3000`. Run tests in a separate terminal while the server is running, or independently. Tests use an in-memory database.
 
-## Enable Google sign-in
+## Enable email sign-in on GitHub Pages
+
+1. In the Supabase dashboard, keep the Email provider enabled and allow new users to sign up so a first sign-in creates their account.
+2. Set the Site URL and allowed redirect URL to `https://louis2495.github.io/memes/` in Authentication → URL Configuration. Keep the default Magic Link email template, which uses the confirmation URL.
+3. Run [supabase/setup.sql](supabase/setup.sql) in the project’s SQL Editor.
+4. Fill in the Project URL and Publishable key in [public/supabase-config.js](public/supabase-config.js) and publish the site. Use the publishable key only.
+5. Send a sign-in link from the website and open it in the same browser. The backend grants shared feed deletion only to the confirmed email `louisanderson477@gmail.com`.
+
+The project’s default email service may restrict recipients to project team members. Configure custom SMTP in Supabase if you need to send links to other addresses. Shared removals hide images from Feed and Good on the next load. The image files are still hosted by GitHub Pages. Likes remain local to the browser.
+
+## Enable Google sign-in on the Node app
 
 Create a Google OAuth **Web application** client. Add `http://localhost:3000/auth/google/callback` as an authorized redirect URI for local development. For a deployed website, add its HTTPS origin followed by `/auth/google/callback`.
 

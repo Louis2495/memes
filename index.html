@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#121016">
   <title>Meme Room</title>
-  <link rel="stylesheet" href="./public/style.css?v=7">
-  <script type="module" src="./public/app.js?v=12"></script>
+  <link rel="stylesheet" href="./public/style.css?v=8">
+  <script type="module" src="./public/app.js?v=13"></script>
 </head>
 <body>
   <header class="top">
@@ -52,6 +52,11 @@
       <h1>Sign in<span>.</span></h1>
       <p>Like memes and find them again in Good.</p>
       <a class="primary" id="google" href="/auth/google" hidden>Continue with Google</a>
+      <form id="email-signin" hidden>
+        <label for="signin-email">Email address</label>
+        <input id="signin-email" name="email" type="email" autocomplete="email" required>
+        <button class="primary" type="submit">Send sign-in link</button>
+      </form>
       <p id="signin-status" role="status"></p>
       <a href="./">Back to the feed</a>
     </section>

@@ -124,7 +124,7 @@ export function createApp({
     ['failed', 'unconfigured'].includes(req.query.error) ? '&error=' + req.query.error : ''
   )));
   app.get('/', (_req, res) => res.type('html').send(homepage));
-  for (const asset of ['app.js', 'style.css']) {
+  for (const asset of ['app.js', 'style.css', 'email-auth.js', 'supabase-config.js']) {
     app.get('/public/' + asset, (_req, res) => {
       res.sendFile(fileURLToPath(new URL('public/' + asset, import.meta.url)), { lastModified: false });
     });

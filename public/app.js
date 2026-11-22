@@ -1,9 +1,12 @@
+import { connectEmailAuth } from './email-auth.js';
+
 const element = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const view = ['good', 'signin'].includes(params.get('view')) ? params.get('view') : 'feed';
 const staticHost = document.documentElement.dataset.host === 'static';
 const controls = ['previous', 'dislike', 'like', 'next'];
 let session;
+let hosted;
 let memes = [];
 let index = 0;
 let busy = false;
@@ -136,8 +139,12 @@ async function vote(reaction) {
   render();
   try {
     let result = { deleted: false };
-    if (staticHost) {
-      if (reaction === 'dislike' || wasRemoved(current.id)) {
+    if (hosted && session?.admin && reaction === 'dislike') {
+      const { error } = await hosted.rpc('remove_meme', { meme_id: current.id });
+      if (error) throw error;
+      result.deleted = true;
+    } else if (staticHost) {
+      if ((!hosted && reaction === 'dislike') || wasRemoved(current.id)) {
         localStorage.setItem(removedKey(current.id), '1');
         result.deleted = true;
       } else {
@@ -155,12 +162,12 @@ async function vote(reaction) {
     } else {
       advance();
     }
-    const removedMessage = staticHost ? 'Meme removed from this browser.' : 'Meme permanently deleted.';
+    const removedMessage = staticHost && !hosted ? 'Meme removed from this browser.' : 'Meme permanently deleted.';
     element('status').textContent = result.deleted ? removedMessage : reaction === 'like' ? 'Saved to Good.' : 'Disliked.';
   } catch (error) {
     if (error.status === 401) location.assign('?view=signin');
     if (error.status === 404) removeCurrent();
-    element('status').textContent = staticHost ? 'Could not save your vote in this browser.' : error.message;
+    element('status').textContent = hosted ? 'Could not update this meme. Try again.' : staticHost ? 'Could not save your vote in this browser.' : error.message;
   } finally {
     busy = false;
     render();
@@ -183,12 +190,68 @@ document.addEventListener('keydown', (event) => {
 
 element('sign-out').onclick = async () => {
   try {
-    await request('/auth/logout', { method: 'POST' });
-    location.assign('/');
+    if (hosted) {
+      const { error } = await hosted.auth.signOut({ scope: 'local' });
+      if (error) throw error;
+    } else {
+      await request('/auth/logout', { method: 'POST' });
+    }
+    location.assign('./');
   } catch {
     element(view === 'signin' ? 'signin-status' : 'status').textContent = 'Could not sign out. Try again.';
   }
 };
+
+function setLeftAction(label, description) {
+  const button = element('dislike');
+  button.setAttribute('aria-label', description);
+  button.title = description + ' (left arrow)';
+  button.querySelector('span').textContent = label;
+  element('left-shortcut').textContent = label;
+}
+
+async function loadHostedAccount() {
+  const { data, error } = await hosted.auth.getSession();
+  if (error) throw error;
+  if (!data.session) return;
+  const { data: admin, error: adminError } = await hosted.rpc('is_meme_admin');
+  if (adminError) throw adminError;
+  session = { email: data.session.user.email, admin };
+  element('sign-in').hidden = true;
+  element('sign-out').hidden = false;
+  if (admin) setLeftAction('Delete', 'Delete from the shared feed');
+}
+
+function showEmailSignIn() {
+  const status = element('signin-status');
+  if (!hosted) {
+    status.textContent = 'Email sign-in is awaiting Supabase setup.';
+    return;
+  }
+  if (session?.email) {
+    status.textContent = `Signed in as ${session.email}${session.admin ? ' · Admin' : ''}`;
+    return;
+  }
+  const form = element('email-signin');
+  form.hidden = false;
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('button');
+    button.disabled = true;
+    try {
+      const { error } = await hosted.auth.signInWithOtp({
+        email: element('signin-email').value.trim(),
+        options: { emailRedirectTo: new URL('./', location.href).href },
+      });
+      if (error) throw error;
+      status.textContent = 'Check your inbox and open the sign-in link in this browser.';
+    } catch (error) {
+      status.textContent = error.message || 'Could not send the link. Try again.';
+    } finally {
+      button.disabled = false;
+    }
+  };
+}
 
 async function init() {
   element('browse').hidden = view === 'signin';
@@ -201,19 +264,21 @@ async function init() {
   }
 
   if (staticHost) {
-    const remove = element('dislike');
-    remove.setAttribute('aria-label', 'Remove meme');
-    remove.title = 'Remove in this browser (left arrow)';
-    remove.querySelector('span').textContent = 'Remove';
-    element('left-shortcut').textContent = 'Remove';
+    hosted = await connectEmailAuth();
+    if (hosted) await loadHostedAccount();
+    else setLeftAction('Remove', 'Remove in this browser');
 
     if (view === 'signin') {
-      element('signin-status').textContent = 'Google sign-in needs the Meme Room server. You can vote in the feed without signing in.';
+      showEmailSignIn();
       return;
     }
 
-    const catalog = await request(new URL('memes/catalog.json?v=10', import.meta.url), { cache: 'no-cache' });
-    const available = catalog.filter(({ id }) => !wasRemoved(id));
+    const catalogRequest = request(new URL('memes/catalog.json?v=10', import.meta.url), { cache: 'no-cache' });
+    const deletionsRequest = hosted ? hosted.rpc('removed_meme_ids') : Promise.resolve({ data: [] });
+    const [catalog, removals] = await Promise.all([catalogRequest, deletionsRequest]);
+    if (removals.error) throw removals.error;
+    const deleted = new Set(removals.data);
+    const available = catalog.filter(({ id }) => !deleted.has(id) && !wasRemoved(id));
     if (view === 'good') memes = available.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like');
     else startFeed(available);
     render();
