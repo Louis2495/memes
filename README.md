@@ -1,6 +1,6 @@
 # Meme Room
 
-A web-only meme feed. The feed is reserved for captioned pictures. The catalog is currently empty. Visitors can browse the feed. Signed-in users can like or dislike a meme, and Good shows the current user's likes. A dislike from the verified Google account `louisanderson477@gmail.com` deletes the meme, its image, and related votes from the shared SQLite database.
+A web-only meme feed. The feed is reserved for captioned pictures. Visitors can browse the feed. Signed-in users can like or dislike a meme, and Good shows the current user's likes. A dislike from the verified Google account `louisanderson477@gmail.com` deletes the meme, its image, and related votes from the shared SQLite database.
 
 | Key | Action |
 | --- | --- |
@@ -10,6 +10,10 @@ A web-only meme feed. The feed is reserved for captioned pictures. The catalog i
 | Left | Dislike and advance |
 
 The controls also work by click or tap.
+
+## Image source
+
+The initial picture batch is seven historical political cartoons by Joseph Keppler. The original artwork was collected in the 1893 book *Cartoons from Puck* and is in the U.S. public domain. The JPEGs are unmodified scans. The original titles appear beneath the images in the feed. [Project Gutenberg, eBook 59604](https://www.gutenberg.org/ebooks/59604)
 
 ## Run locally
 

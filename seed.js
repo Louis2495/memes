@@ -27,7 +27,8 @@ export function importStarterMemes(db) {
     removeRetiredTextCards(db);
     for (const entry of catalog) {
       if (markImported.run(entry.id).changes) {
-        insertMeme.run(entry.title, 'image/webp', readFileSync(new URL(entry.image, directory)));
+        const mime = entry.image.endsWith('.jpg') ? 'image/jpeg' : 'image/webp';
+        insertMeme.run(entry.title, mime, readFileSync(new URL(entry.image, directory)));
       }
     }
     db.exec('COMMIT');
