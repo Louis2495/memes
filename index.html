@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#121016">
   <title>Meme Room</title>
   <link rel="stylesheet" href="./public/style.css?v=7">
-  <script type="module" src="./public/app.js?v=11"></script>
+  <script type="module" src="./public/app.js?v=12"></script>
 </head>
 <body>
   <header class="top">
@@ -44,7 +44,7 @@
           <button id="next" aria-label="Next meme" title="Next meme (down arrow)" disabled>↓</button>
         </div>
       </article>
-      <div class="shortcuts"><span><kbd>↑</kbd> Previous</span><span><kbd>←</kbd> Dislike</span><span><kbd>→</kbd> Like</span><span><kbd>↓</kbd> Next</span></div>
+      <div class="shortcuts"><span><kbd>↑</kbd> Previous</span><span><kbd>←</kbd> <span id="left-shortcut">Dislike</span></span><span><kbd>→</kbd> Like</span><span><kbd>↓</kbd> Next</span></div>
       <p id="status" role="status"></p>
     </section>
     <section id="signin" class="signin card" hidden>

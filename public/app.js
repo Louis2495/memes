@@ -12,6 +12,7 @@ let previouslySeen = 0;
 const seenOnThisPage = new Set();
 
 const voteKey = (id) => `meme-room:vote:${id}`;
+const removedKey = (id) => `meme-room:removed:${id}`;
 
 async function request(path, options) {
   const response = await fetch(path, options);
@@ -23,13 +24,16 @@ async function request(path, options) {
 
 const seenKey = (id) => `meme-room:seen:${id}`;
 
-function wasSeen(id) {
+function hasStoredFlag(key) {
   try {
-    return localStorage.getItem(seenKey(id)) !== null;
+    return localStorage.getItem(key) !== null;
   } catch {
     return false;
   }
 }
+
+const wasSeen = (id) => hasStoredFlag(seenKey(id));
+const wasRemoved = (id) => hasStoredFlag(removedKey(id));
 
 function showFeedMeme(position) {
   while (memes[position] && !seenOnThisPage.has(memes[position].id) && wasSeen(memes[position].id)) {
@@ -133,7 +137,12 @@ async function vote(reaction) {
   try {
     let result = { deleted: false };
     if (staticHost) {
-      localStorage.setItem(voteKey(current.id), reaction);
+      if (reaction === 'dislike' || wasRemoved(current.id)) {
+        localStorage.setItem(removedKey(current.id), '1');
+        result.deleted = true;
+      } else {
+        localStorage.setItem(voteKey(current.id), reaction);
+      }
     } else {
       result = await request(`/api/memes/${current.id}/vote`, {
         method: 'POST',
@@ -146,7 +155,8 @@ async function vote(reaction) {
     } else {
       advance();
     }
-    element('status').textContent = result.deleted ? 'Meme permanently deleted.' : reaction === 'like' ? 'Saved to Good.' : 'Disliked.';
+    const removedMessage = staticHost ? 'Meme removed from this browser.' : 'Meme permanently deleted.';
+    element('status').textContent = result.deleted ? removedMessage : reaction === 'like' ? 'Saved to Good.' : 'Disliked.';
   } catch (error) {
     if (error.status === 401) location.assign('?view=signin');
     if (error.status === 404) removeCurrent();
@@ -191,14 +201,21 @@ async function init() {
   }
 
   if (staticHost) {
+    const remove = element('dislike');
+    remove.setAttribute('aria-label', 'Remove meme');
+    remove.title = 'Remove in this browser (left arrow)';
+    remove.querySelector('span').textContent = 'Remove';
+    element('left-shortcut').textContent = 'Remove';
+
     if (view === 'signin') {
       element('signin-status').textContent = 'Google sign-in needs the Meme Room server. You can vote in the feed without signing in.';
       return;
     }
 
     const catalog = await request(new URL('memes/catalog.json?v=10', import.meta.url), { cache: 'no-cache' });
-    if (view === 'good') memes = catalog.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like');
-    else startFeed(catalog);
+    const available = catalog.filter(({ id }) => !wasRemoved(id));
+    if (view === 'good') memes = available.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like');
+    else startFeed(available);
     render();
     return;
   }

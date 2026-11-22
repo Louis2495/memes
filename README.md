@@ -7,7 +7,7 @@ A web-only meme feed. The feed is reserved for captioned pictures. Visitors can 
 | Up | Previous meme |
 | Down | Next meme |
 | Right | Like and advance |
-| Left | Dislike and advance |
+| Left | Remove in GitHub Pages, or dislike in the Node app, then advance |
 
 The controls also work by click or tap. The feed shuffles unseen memes, remembers which ones it has shown in the current browser, and stops when it runs out. Up revisits earlier cards in the current page.
 
@@ -39,7 +39,7 @@ Copy `.env.example` to `.env` and fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_
 
 In the repository’s Pages settings, select **Deploy from a branch**, then **main** and **/ (root)**. The Pages URL opens the dark feed from `index.html`.
 
-Pages serves a browsable snapshot from `public/memes/catalog.json`. Pages saves votes and Good locally in the current browser. Deploy the Node app for Google sign-in, account-based voting, and shared moderation. Startup imports each catalog entry into SQLite once, so an admin-deleted meme stays deleted after a restart. Removing a meme from the separate Pages snapshot requires removing its catalog entry and image from the published branch.
+Pages serves a browsable snapshot from `public/memes/catalog.json`. Pages saves likes and removals in the current browser. Left arrow removes the current image from Feed and Good across reloads. Deploy the Node app for Google sign-in, account-based voting, and shared moderation. Startup imports each catalog entry into SQLite once, so an admin-deleted meme stays deleted after a restart. Removing a meme from the separate Pages snapshot requires removing its catalog entry and image from the published branch.
 
 ## Deployment
 
