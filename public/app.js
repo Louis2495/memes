@@ -135,7 +135,7 @@ async function init() {
       return;
     }
 
-    const catalog = await request(new URL('memes/catalog.json?v=6', import.meta.url), { cache: 'no-cache' });
+    const catalog = await request(new URL('memes/catalog.json?v=7', import.meta.url), { cache: 'no-cache' });
     memes = view === 'good' ? catalog.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like') : catalog;
     render();
     return;

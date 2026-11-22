@@ -6,17 +6,17 @@ const mimeByExtension = { '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'i
 const directory = new URL('./public/memes/', import.meta.url);
 
 function removeRetiredFeedImages(db) {
-  if (db.prepare('PRAGMA user_version').get().user_version >= 2) return;
+  if (db.prepare('PRAGMA user_version').get().user_version >= 3) return;
 
   const hashes = new Set(JSON.parse(
     readFileSync(new URL('./retired-feed-image-hashes.json', import.meta.url), 'utf8')
   ));
   const deleteMeme = db.prepare('DELETE FROM memes WHERE id = ?');
-  const images = db.prepare("SELECT id, image FROM memes WHERE mime IN ('image/webp', 'image/jpeg')").all();
+  const images = db.prepare("SELECT id, image FROM memes WHERE mime IN ('image/webp', 'image/jpeg', 'image/png')").all();
   for (const { id, image } of images) {
     if (hashes.has(createHash('sha256').update(image).digest('hex'))) deleteMeme.run(id);
   }
-  db.exec('PRAGMA user_version = 2');
+  db.exec('PRAGMA user_version = 3');
 }
 
 export function importStarterMemes(db) {
