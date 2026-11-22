@@ -7,6 +7,9 @@ let session;
 let memes = [];
 let index = 0;
 let busy = false;
+let feedTotal = 0;
+let previouslySeen = 0;
+const seenOnThisPage = new Set();
 
 const voteKey = (id) => `meme-room:vote:${id}`;
 
@@ -18,11 +21,67 @@ async function request(path, options) {
   return result;
 }
 
+const seenKey = (id) => `meme-room:seen:${id}`;
+
+function wasSeen(id) {
+  try {
+    return localStorage.getItem(seenKey(id)) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function showFeedMeme(position) {
+  while (memes[position] && !seenOnThisPage.has(memes[position].id) && wasSeen(memes[position].id)) {
+    memes.splice(position, 1);
+    previouslySeen++;
+  }
+  index = position;
+  const current = memes[index];
+  if (!current || seenOnThisPage.has(current.id)) return;
+
+  seenOnThisPage.add(current.id);
+  try {
+    localStorage.setItem(seenKey(current.id), '1');
+  } catch {
+    // The current page still traverses the shuffled list without replacement.
+  }
+}
+
+function startFeed(catalog) {
+  feedTotal = catalog.length;
+  memes = catalog.filter(({ id }) => !wasSeen(id));
+  previouslySeen = feedTotal - memes.length;
+  for (let last = memes.length - 1; last > 0; last--) {
+    const other = Math.floor(Math.random() * (last + 1));
+    [memes[last], memes[other]] = [memes[other], memes[last]];
+  }
+  showFeedMeme(0);
+}
+
+function advance() {
+  if (view === 'feed') showFeedMeme(index + 1);
+  else index = (index + 1) % memes.length;
+}
+
+function removeCurrent() {
+  memes.splice(index, 1);
+  if (view === 'feed') {
+    feedTotal--;
+    showFeedMeme(index);
+  } else {
+    index %= memes.length || 1;
+  }
+}
+
 function render(message) {
   const current = memes[index];
   const good = view === 'good';
+  const caughtUp = view === 'feed' && !current && feedTotal > 0;
   const needsSignIn = good && !staticHost && !session?.email;
-  element('position').textContent = current ? `${index + 1} / ${memes.length}` : '— / —';
+  const position = good ? index + 1 : previouslySeen + index + 1;
+  const total = good ? memes.length : feedTotal;
+  element('position').textContent = current ? `${position} / ${total}` : caughtUp ? `${total} / ${total}` : '— / —';
   element('empty').hidden = Boolean(current);
   element('meme').hidden = !current;
   const caption = element('meme-caption');
@@ -35,18 +94,24 @@ function render(message) {
     if (image.getAttribute('src') !== source) image.src = source;
   } else {
     element('meme').removeAttribute('src');
-    element('empty-title').textContent = needsSignIn ? 'Your likes live here' : good ? 'Nothing saved yet' : 'No memes yet';
-    element('empty-description').textContent = message ?? (good
-      ? needsSignIn ? 'Sign in to see the memes you’ve liked.' : 'Like a meme in the feed to save it here.'
-      : 'Check back when the first memes drop.');
+    element('empty-title').textContent = caughtUp ? 'You’re caught up'
+      : needsSignIn ? 'Your likes live here' : good ? 'Nothing saved yet' : 'No memes yet';
+    element('empty-description').textContent = message ?? (caughtUp ? 'New memes will appear here when they’re added.'
+      : needsSignIn ? 'Sign in to see the memes you’ve liked.'
+      : good ? 'Like a meme in the feed to save it here.' : 'Check back when the first memes drop.');
     element('empty-action').hidden = !needsSignIn;
   }
-  controls.forEach((id) => { element(id).disabled = busy || !current; });
+  controls.forEach((id) => {
+    const canGoBack = id === 'previous' && !good;
+    element(id).disabled = busy || (canGoBack ? index === 0 : !current);
+  });
 }
 
 function move(offset) {
   if (busy || !memes.length) return;
-  index = (index + offset + memes.length) % memes.length;
+  if (view === 'good') index = (index + offset + memes.length) % memes.length;
+  else if (offset < 0) index = Math.max(0, index - 1);
+  else if (index < memes.length) advance();
   element('status').textContent = '';
   render();
 }
@@ -77,18 +142,14 @@ async function vote(reaction) {
       });
     }
     if (result.deleted || (view === 'good' && reaction === 'dislike')) {
-      memes.splice(index, 1);
-      index %= memes.length || 1;
+      removeCurrent();
     } else {
-      index = (index + 1) % memes.length;
+      advance();
     }
     element('status').textContent = result.deleted ? 'Meme permanently deleted.' : reaction === 'like' ? 'Saved to Good.' : 'Disliked.';
   } catch (error) {
     if (error.status === 401) location.assign('?view=signin');
-    if (error.status === 404) {
-      memes.splice(index, 1);
-      index %= memes.length || 1;
-    }
+    if (error.status === 404) removeCurrent();
     element('status').textContent = staticHost ? 'Could not save your vote in this browser.' : error.message;
   } finally {
     busy = false;
@@ -135,8 +196,9 @@ async function init() {
       return;
     }
 
-    const catalog = await request(new URL('memes/catalog.json?v=9', import.meta.url), { cache: 'no-cache' });
-    memes = view === 'good' ? catalog.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like') : catalog;
+    const catalog = await request(new URL('memes/catalog.json?v=10', import.meta.url), { cache: 'no-cache' });
+    if (view === 'good') memes = catalog.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like');
+    else startFeed(catalog);
     render();
     return;
   }
@@ -151,7 +213,7 @@ async function init() {
     loadSession.catch(() => {
       element('status').textContent = 'Could not check sign-in. Refresh to retry.';
     });
-    memes = await request('/api/memes');
+    startFeed(await request('/api/memes'));
     render();
     return;
   }

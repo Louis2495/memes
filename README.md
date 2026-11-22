@@ -9,7 +9,7 @@ A web-only meme feed. The feed is reserved for captioned pictures. Visitors can 
 | Right | Like and advance |
 | Left | Dislike and advance |
 
-The controls also work by click or tap.
+The controls also work by click or tap. The feed shuffles unseen memes, remembers which ones it has shown in the current browser, and stops when it runs out. Up revisits earlier cards in the current page.
 
 ## Catalog sources
 
