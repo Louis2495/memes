@@ -1,4 +1,4 @@
-import { connectEmailAuth } from './email-auth.js';
+import { connectEmailAuth } from './email-auth.js?v=1';
 
 const element = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
