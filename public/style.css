@@ -58,7 +58,6 @@ p { color: var(--muted); line-height: 1.5; }
 .empty-icon { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--raised); color: var(--purple); font-size: 39px; }
 h2 { margin: 16px 0 0; letter-spacing: -.04em; }
 #empty-description { margin: 7px 0 0; }
-.meme-caption { margin: 8px 4px 0; text-align: center; font-size: 14px; }
 .actions { display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; gap: 8px; margin-top: 12px; }
 .actions button, .primary { background: var(--raised); border: 1px solid transparent; border-radius: 10px; padding: 10px 5px; cursor: pointer; color: var(--purple); font-weight: 750; }
 .actions button:disabled { background: #241f2b; color: #9389a2; cursor: default; }
@@ -95,11 +94,10 @@ body:has(#browse:not([hidden])) main {
 #browse .intro p { margin: 4px 0 0; }
 #browse .card {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   min-height: 0;
 }
 #browse .shortcuts { margin: 0; }
-#browse .meme-caption { overflow-wrap: anywhere; }
 
 @media (max-height: 620px) {
   .top { min-height: 48px; }
@@ -108,7 +106,6 @@ body:has(#browse:not([hidden])) main {
   #browse .card-head { padding: 2px 4px 6px; }
   #browse .actions { margin-top: 6px; }
   #browse .actions button { padding-block: 6px; }
-  #browse .meme-caption { margin-top: 4px; }
   #empty { padding: 8px; }
   #empty .empty-icon { width: 36px; height: 36px; border-radius: 12px; font-size: 25px; }
   #empty h2 { margin-top: 5px; }

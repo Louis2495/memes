@@ -91,9 +91,6 @@ function render(message) {
   element('position').textContent = current ? `${position} / ${total}` : caughtUp ? `${total} / ${total}` : '— / —';
   element('empty').hidden = Boolean(current);
   element('meme').hidden = !current;
-  const caption = element('meme-caption');
-  caption.hidden = !current;
-  caption.textContent = current?.title ?? '';
   if (current) {
     const image = element('meme');
     image.alt = current.alt ?? current.title;
