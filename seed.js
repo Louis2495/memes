@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { extname } from 'node:path';
 
+const mimeByExtension = { '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 const directory = new URL('./public/memes/', import.meta.url);
 
 function removeRetiredFeedImages(db) {
@@ -27,7 +29,8 @@ export function importStarterMemes(db) {
     removeRetiredFeedImages(db);
     for (const entry of catalog) {
       if (markImported.run(entry.id).changes) {
-        const mime = entry.image.endsWith('.jpg') ? 'image/jpeg' : 'image/webp';
+        const mime = mimeByExtension[extname(entry.image)];
+        if (!mime) throw new Error(`Unsupported meme image: ${entry.image}`);
         insertMeme.run(entry.title, mime, readFileSync(new URL(entry.image, directory)));
       }
     }

@@ -11,6 +11,10 @@ A web-only meme feed. The feed is reserved for captioned pictures. Visitors can 
 
 The controls also work by click or tap.
 
+## Artwork credits
+
+The current catalog uses existing xkcd strips by Randall Munroe under [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/). See [the author's reuse terms](https://xkcd.com/license.html). The feed is noncommercial, and the original images were obtained from the [binarez archive](https://github.com/binarez/xkcd_archive/tree/master/xkcd).
+
 ## Run locally
 
 Requires Node.js 24 or later.

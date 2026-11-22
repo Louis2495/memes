@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "id": "xkcd-386",
+    "title": "Duty Calls",
+    "image": "xkcd-386.png"
+  },
+  {
+    "id": "xkcd-37",
+    "title": "Hyphen",
+    "image": "xkcd-37.jpg"
+  },
+  {
+    "id": "xkcd-612",
+    "title": "Estimation",
+    "image": "xkcd-612.png"
+  },
+  {
+    "id": "xkcd-979",
+    "title": "Wisdom of the Ancients",
+    "image": "xkcd-979.png"
+  },
+  {
+    "id": "xkcd-234",
+    "title": "Escape Artist",
+    "image": "xkcd-234.png"
+  },
+  {
+    "id": "xkcd-927",
+    "title": "Standards",
+    "image": "xkcd-927.png"
+  },
+  {
+    "id": "xkcd-303",
+    "title": "Compiling",
+    "image": "xkcd-303.png"
+  }
+]
