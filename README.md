@@ -15,7 +15,7 @@ The controls also work by click or tap. The feed shuffles unseen memes, remember
 
 The current catalog includes a hand-reviewed selection of finished memes from [Dank Meme Paradise](https://github.com/Silent-dawn/Dank_Meme_Paradise), [SeansLifeArchive Images Memes](https://github.com/seanpm2001/SeansLifeArchive_Images_Memes), and [programming-memes](https://github.com/dpnkrpl/programming-memes).
 
-Some entries restore captions from published posts in the [ImgFlip575K archive](https://github.com/schesa/ImgFlip575K_Dataset) on their corresponding templates. Each restored entry keeps the original post URL. The live catalog is a smaller selection reviewed for image and punchline. Earlier, larger batches were screened by template, caption, and duplicate filters.
+Some entries restore captions from published posts in the [ImgFlip575K archive](https://github.com/schesa/ImgFlip575K_Dataset) on their corresponding templates. Each restored entry keeps the original post URL. The catalog combines individually reviewed screenshots and finished memes with larger, vote-ranked batches screened by template, caption, and duplicate filters and spot-checked visually.
 
 ## Run locally
 
