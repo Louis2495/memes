@@ -25,7 +25,7 @@ function render(message) {
   if (current) {
     const image = element('meme');
     image.alt = current.title;
-    const source = `/api/memes/${current.id}/image`;
+    const source = staticHost ? `./public/memes/${current.image}` : `/api/memes/${current.id}/image`;
     if (image.getAttribute('src') !== source) image.src = source;
   } else {
     element('meme').removeAttribute('src');
@@ -35,7 +35,10 @@ function render(message) {
       : 'Check back when the first memes drop.');
     element('empty-action').hidden = !(good && !session?.email);
   }
-  controls.forEach((id) => { element(id).disabled = busy || !current; });
+  controls.forEach((id) => {
+    const needsServer = staticHost && (id === 'like' || id === 'dislike');
+    element(id).disabled = busy || !current || needsServer;
+  });
 }
 
 function move(offset) {
@@ -122,6 +125,10 @@ async function init() {
     if (view === 'signin') {
       element('signin-status').textContent = 'Google sign-in needs the Meme Room server.';
     } else {
+      if (view === 'feed') {
+        memes = await request('./public/memes/catalog.json');
+        element('status').textContent = 'Voting is available on the hosted Meme Room app.';
+      }
       render(view === 'good' ? 'Saved likes are available on the hosted Meme Room app.' : undefined);
       element('empty-action').hidden = true;
     }

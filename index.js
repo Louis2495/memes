@@ -1,4 +1,8 @@
+import { openDatabase } from './db.js';
+import { importStarterMemes } from './seed.js';
 import { createApp } from './server.js';
 
 const port = Number(process.env.PORT ?? 3000);
-createApp().listen(port, '0.0.0.0', () => console.log(`Memes listening on port ${port}`));
+const db = openDatabase();
+importStarterMemes(db);
+createApp({ db }).listen(port, '0.0.0.0', () => console.log(`Memes listening on port ${port}`));

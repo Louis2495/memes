@@ -124,9 +124,10 @@ export function createApp({
     ['failed', 'unconfigured'].includes(req.query.error) ? '&error=' + req.query.error : ''
   )));
   app.get('/', (_req, res) => res.type('html').send(homepage));
-  app.use('/public', express.static(fileURLToPath(new URL('./public/', import.meta.url)), {
-    etag: false,
-    lastModified: false,
-  }));
+  for (const asset of ['app.js', 'style.css']) {
+    app.get('/public/' + asset, (_req, res) => {
+      res.sendFile(fileURLToPath(new URL('public/' + asset, import.meta.url)), { lastModified: false });
+    });
+  }
   return app;
 }

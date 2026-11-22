@@ -1,6 +1,6 @@
 # Meme Room
 
-A web-only meme feed. The site starts with an empty library. Visitors can browse the feed. Signed-in users can like or dislike a meme, and Good shows the current user's likes. A dislike from the verified Google account `louisanderson477@gmail.com` deletes the meme, its image, and related votes from the shared SQLite database.
+A web-only meme feed. The starter library contains original text memes about fiscal restraint, bureaucracy, and self-reliance. The starter batch uses original captions and artwork with no third-party meme material. Visitors can browse the feed. Signed-in users can like or dislike a meme, and Good shows the current user's likes. A dislike from the verified Google account `louisanderson477@gmail.com` deletes the meme, its image, and related votes from the shared SQLite database.
 
 | Key | Action |
 | --- | --- |
@@ -33,7 +33,7 @@ Copy `.env.example` to `.env` and fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_
 
 In the repository’s Pages settings, select **Deploy from a branch**, then **main** and **/ (root)**. The Pages URL opens the dark feed from `index.html`.
 
-The Pages site shows the empty feed until a full deployment is available. To use the shared meme library, sign in, vote, or moderate, deploy the Node app using the settings below and open its URL.
+Pages serves a browsable snapshot from `public/memes/catalog.json`. Deploy the Node app for sign-in, voting, and moderation. Startup imports each catalog entry into SQLite once, so an admin-deleted meme stays deleted after a restart. Removing a meme from the separate Pages snapshot requires removing its catalog entry and image from the published branch.
 
 ## Deployment
 
