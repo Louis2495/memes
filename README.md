@@ -37,7 +37,7 @@ Copy `.env.example` to `.env` and fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_
 
 In the repository’s Pages settings, select **Deploy from a branch**, then **main** and **/ (root)**. The Pages URL opens the dark feed from `index.html`.
 
-Pages serves a browsable snapshot from `public/memes/catalog.json`. Deploy the Node app for sign-in, voting, and moderation. Startup imports each catalog entry into SQLite once, so an admin-deleted meme stays deleted after a restart. Removing a meme from the separate Pages snapshot requires removing its catalog entry and image from the published branch.
+Pages serves a browsable snapshot from `public/memes/catalog.json`. Pages saves votes and Good locally in the current browser. Deploy the Node app for Google sign-in, account-based voting, and shared moderation. Startup imports each catalog entry into SQLite once, so an admin-deleted meme stays deleted after a restart. Removing a meme from the separate Pages snapshot requires removing its catalog entry and image from the published branch.
 
 ## Deployment
 

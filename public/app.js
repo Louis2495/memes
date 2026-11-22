@@ -8,6 +8,8 @@ let memes = [];
 let index = 0;
 let busy = false;
 
+const voteKey = (id) => `meme-room:vote:${id}`;
+
 async function request(path, options) {
   const response = await fetch(path, options);
   if (response.status === 204) return;
@@ -19,6 +21,7 @@ async function request(path, options) {
 function render(message) {
   const current = memes[index];
   const good = view === 'good';
+  const needsSignIn = good && !staticHost && !session?.email;
   element('position').textContent = current ? `${index + 1} / ${memes.length}` : '— / —';
   element('empty').hidden = Boolean(current);
   element('meme').hidden = !current;
@@ -32,16 +35,13 @@ function render(message) {
     if (image.getAttribute('src') !== source) image.src = source;
   } else {
     element('meme').removeAttribute('src');
-    element('empty-title').textContent = good && !session?.email ? 'Your likes live here' : good ? 'Nothing saved yet' : 'No memes yet';
+    element('empty-title').textContent = needsSignIn ? 'Your likes live here' : good ? 'Nothing saved yet' : 'No memes yet';
     element('empty-description').textContent = message ?? (good
-      ? session?.email ? 'Like a meme in the feed to save it here.' : 'Sign in to see the memes you’ve liked.'
+      ? needsSignIn ? 'Sign in to see the memes you’ve liked.' : 'Like a meme in the feed to save it here.'
       : 'Check back when the first memes drop.');
-    element('empty-action').hidden = !(good && !session?.email);
+    element('empty-action').hidden = !needsSignIn;
   }
-  controls.forEach((id) => {
-    const needsServer = staticHost && (id === 'like' || id === 'dislike');
-    element(id).disabled = busy || !current || needsServer;
-  });
+  controls.forEach((id) => { element(id).disabled = busy || !current; });
 }
 
 function move(offset) {
@@ -54,11 +54,11 @@ function move(offset) {
 async function vote(reaction) {
   const current = memes[index];
   if (!current || busy) return;
-  if (!session) {
+  if (!staticHost && !session) {
     element('status').textContent = 'Checking sign-in. Try again in a moment.';
     return;
   }
-  if (!session.email) {
+  if (!staticHost && !session.email) {
     location.assign('?view=signin');
     return;
   }
@@ -66,11 +66,16 @@ async function vote(reaction) {
   busy = true;
   render();
   try {
-    const result = await request(`/api/memes/${current.id}/vote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reaction }),
-    });
+    let result = { deleted: false };
+    if (staticHost) {
+      localStorage.setItem(voteKey(current.id), reaction);
+    } else {
+      result = await request(`/api/memes/${current.id}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reaction }),
+      });
+    }
     if (result.deleted || (view === 'good' && reaction === 'dislike')) {
       memes.splice(index, 1);
       index %= memes.length || 1;
@@ -84,7 +89,7 @@ async function vote(reaction) {
       memes.splice(index, 1);
       index %= memes.length || 1;
     }
-    element('status').textContent = error.message;
+    element('status').textContent = staticHost ? 'Could not save your vote in this browser.' : error.message;
   } finally {
     busy = false;
     render();
@@ -120,27 +125,19 @@ async function init() {
   document.querySelector(`[data-view="${view}"]`)?.setAttribute('aria-current', 'page');
   if (view === 'good') {
     element('heading').firstChild.textContent = 'Good';
-    element('subtitle').textContent = 'All the memes you’ve liked.';
+    element('subtitle').textContent = staticHost ? 'Memes liked in this browser.' : 'All the memes you’ve liked.';
     element('card-label').textContent = 'YOUR LIKES';
   }
 
   if (staticHost) {
     if (view === 'signin') {
-      element('signin-status').textContent = 'Google sign-in needs the Meme Room server.';
-    } else {
-      if (view === 'feed') {
-        try {
-          memes = await request(new URL('memes/catalog.json?v=6', import.meta.url), { cache: 'no-cache' });
-        } catch {
-          element('empty-title').textContent = 'Could not load the feed';
-          element('empty-description').textContent = 'Refresh to retry.';
-          return;
-        }
-        if (memes.length) element('status').textContent = 'Voting is available on the hosted Meme Room app.';
-      }
-      render(view === 'good' ? 'Saved likes are available on the hosted Meme Room app.' : undefined);
-      element('empty-action').hidden = true;
+      element('signin-status').textContent = 'Google sign-in needs the Meme Room server. You can vote in the feed without signing in.';
+      return;
     }
+
+    const catalog = await request(new URL('memes/catalog.json?v=6', import.meta.url), { cache: 'no-cache' });
+    memes = view === 'good' ? catalog.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like') : catalog;
+    render();
     return;
   }
 
