@@ -11,10 +11,6 @@ A web-only meme feed. The feed is reserved for captioned pictures. Visitors can 
 
 The controls also work by click or tap.
 
-## Image source
-
-The initial picture batch is seven historical political cartoons by Joseph Keppler. The original artwork was collected in the 1893 book *Cartoons from Puck* and is in the U.S. public domain. The JPEGs are unmodified scans. The original titles appear beneath the images in the feed. [Project Gutenberg, eBook 59604](https://www.gutenberg.org/ebooks/59604)
-
 ## Run locally
 
 Requires Node.js 24 or later.

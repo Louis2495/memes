@@ -3,18 +3,18 @@ import { readFileSync } from 'node:fs';
 
 const directory = new URL('./public/memes/', import.meta.url);
 
-function removeRetiredTextCards(db) {
-  if (db.prepare('PRAGMA user_version').get().user_version >= 1) return;
+function removeRetiredFeedImages(db) {
+  if (db.prepare('PRAGMA user_version').get().user_version >= 2) return;
 
   const hashes = new Set(JSON.parse(
-    readFileSync(new URL('./retired-text-card-hashes.json', import.meta.url), 'utf8')
+    readFileSync(new URL('./retired-feed-image-hashes.json', import.meta.url), 'utf8')
   ));
   const deleteMeme = db.prepare('DELETE FROM memes WHERE id = ?');
-  const images = db.prepare("SELECT id, image FROM memes WHERE mime = 'image/webp'").all();
+  const images = db.prepare("SELECT id, image FROM memes WHERE mime IN ('image/webp', 'image/jpeg')").all();
   for (const { id, image } of images) {
     if (hashes.has(createHash('sha256').update(image).digest('hex'))) deleteMeme.run(id);
   }
-  db.exec('PRAGMA user_version = 1');
+  db.exec('PRAGMA user_version = 2');
 }
 
 export function importStarterMemes(db) {
@@ -24,7 +24,7 @@ export function importStarterMemes(db) {
   const insertMeme = db.prepare('INSERT INTO memes (title, mime, image) VALUES (?, ?, ?)');
   db.exec('BEGIN IMMEDIATE');
   try {
-    removeRetiredTextCards(db);
+    removeRetiredFeedImages(db);
     for (const entry of catalog) {
       if (markImported.run(entry.id).changes) {
         const mime = entry.image.endsWith('.jpg') ? 'image/jpeg' : 'image/webp';

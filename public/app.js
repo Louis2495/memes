@@ -130,7 +130,7 @@ async function init() {
     } else {
       if (view === 'feed') {
         try {
-          memes = await request(new URL('memes/catalog.json?v=4', import.meta.url), { cache: 'no-cache' });
+          memes = await request(new URL('memes/catalog.json?v=5', import.meta.url), { cache: 'no-cache' });
         } catch {
           element('empty-title').textContent = 'Could not load the feed';
           element('empty-description').textContent = 'Refresh to retry.';
