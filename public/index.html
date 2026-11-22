@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meme Room</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/"><span aria-hidden="true">✦</span> meme room</a>
+    <nav aria-label="Main">
+      <a href="/" data-view="feed">Feed</a>
+      <a href="/?view=good" data-view="good">♡ Good</a>
+    </nav>
+    <a class="account" id="sign-in" href="/signin">Sign in <span aria-hidden="true">↗</span></a>
+    <button class="account" id="sign-out" hidden>Sign out</button>
+  </header>
+  <main>
+    <section id="browse">
+      <div class="intro">
+        <h1 id="heading">Meme feed<span>.</span></h1>
+        <p id="subtitle">Find something worth a laugh.</p>
+      </div>
+      <article class="card">
+        <div class="card-head"><span id="card-label">THE FEED</span><span id="position">— / —</span></div>
+        <div class="stage">
+          <div id="empty">
+            <div class="empty-icon" aria-hidden="true">☻</div>
+            <h2 id="empty-title">Loading memes…</h2>
+            <p id="empty-description"></p>
+            <a id="empty-action" class="primary" href="/signin" hidden>Sign in</a>
+          </div>
+          <img id="meme" alt="" hidden>
+        </div>
+        <div class="actions" aria-label="Meme controls">
+          <button id="previous" aria-label="Previous meme" title="Previous meme (up arrow)" disabled>↑</button>
+          <button id="dislike" aria-label="Dislike" title="Dislike (left arrow)" disabled>← <span>Dislike</span></button>
+          <button id="like" aria-label="Like" title="Like (right arrow)" disabled><span>Like</span> →</button>
+          <button id="next" aria-label="Next meme" title="Next meme (down arrow)" disabled>↓</button>
+        </div>
+      </article>
+      <div class="shortcuts"><span><kbd>↑</kbd> Previous</span><span><kbd>←</kbd> Dislike</span><span><kbd>→</kbd> Like</span><span><kbd>↓</kbd> Next</span></div>
+      <p id="status" role="status"></p>
+    </section>
+    <section id="signin" class="signin card" hidden>
+      <span class="empty-icon" aria-hidden="true">✦</span>
+      <h1>Sign in<span>.</span></h1>
+      <p>Like memes and find them again in Good.</p>
+      <a class="primary" id="google" href="/auth/google" hidden>Continue with Google</a>
+      <p id="signin-status" role="status"></p>
+      <a href="/">Back to the feed</a>
+    </section>
+  </main>
+</body>
+</html>
