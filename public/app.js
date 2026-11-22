@@ -18,6 +18,8 @@ async function request(path, options) {
 
 function render(message) {
   const current = memes[index];
+  const preview = element('pages-preview');
+  if (preview) preview.hidden = true;
   const good = view === 'good';
   element('position').textContent = current ? `${index + 1} / ${memes.length}` : '— / —';
   element('empty').hidden = Boolean(current);
@@ -25,7 +27,7 @@ function render(message) {
   if (current) {
     const image = element('meme');
     image.alt = current.title;
-    const source = staticHost ? `./public/memes/${current.image}` : `/api/memes/${current.id}/image`;
+    const source = staticHost ? new URL(`memes/${current.image}`, import.meta.url).href : `/api/memes/${current.id}/image`;
     if (image.getAttribute('src') !== source) image.src = source;
   } else {
     element('meme').removeAttribute('src');
@@ -126,7 +128,12 @@ async function init() {
       element('signin-status').textContent = 'Google sign-in needs the Meme Room server.';
     } else {
       if (view === 'feed') {
-        memes = await request('./public/memes/catalog.json');
+        try {
+          memes = await request(new URL('memes/catalog.json?v=2', import.meta.url), { cache: 'no-cache' });
+        } catch {
+          element('status').textContent = 'Could not load the full feed. Refresh to retry.';
+          return;
+        }
         element('status').textContent = 'Voting is available on the hosted Meme Room app.';
       }
       render(view === 'good' ? 'Saved likes are available on the hosted Meme Room app.' : undefined);

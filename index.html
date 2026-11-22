@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#121016">
   <title>Meme Room</title>
-  <link rel="stylesheet" href="./public/style.css">
-  <script type="module" src="./public/app.js"></script>
+  <link rel="stylesheet" href="./public/style.css?v=2">
+  <script type="module" src="./public/app.js?v=2"></script>
 </head>
 <body>
   <header class="top">
@@ -28,6 +28,11 @@
       <article class="card">
         <div class="card-head"><span id="card-label">THE FEED</span><span id="position">— / —</span></div>
         <div class="stage">
+          <!-- pages-preview:start -->
+          <img id="pages-preview" src="./public/memes/original-001.webp"
+            alt="Congress discovers a spending limit. Immediately asks if it comes in a larger size."
+            width="1000" height="630" fetchpriority="high">
+          <!-- pages-preview:end -->
           <div id="empty">
             <div class="empty-icon" aria-hidden="true">☻</div>
             <h2 id="empty-title">Loading memes…</h2>

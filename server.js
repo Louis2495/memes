@@ -9,7 +9,8 @@ const adminEmail = 'louisanderson477@gmail.com';
 const token = () => randomBytes(32).toString('hex');
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const homepage = readFileSync(new URL('./index.html', import.meta.url), 'utf8')
-  .replace('data-host="static"', 'data-host="server"');
+  .replace('data-host="static"', 'data-host="server"')
+  .replace(/<!-- pages-preview:start -->[\s\S]*?<!-- pages-preview:end -->/, '');
 const sessionAge = 7 * 24 * 60 * 60 * 1000;
 
 export function createApp({
