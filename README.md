@@ -11,6 +11,10 @@ A web-only meme feed. The feed is reserved for captioned pictures. Visitors can 
 
 The controls also work by click or tap.
 
+## Catalog sources
+
+The current catalog includes a hand-reviewed selection of finished memes from [Dank Meme Paradise](https://github.com/Silent-dawn/Dank_Meme_Paradise), [SeansLifeArchive Images Memes](https://github.com/seanpm2001/SeansLifeArchive_Images_Memes), and [programming-memes](https://github.com/dpnkrpl/programming-memes).
+
 ## Run locally
 
 Requires Node.js 24 or later.
