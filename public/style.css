@@ -63,9 +63,10 @@ h2 { margin: 16px 0 0; letter-spacing: -.04em; }
 .actions button:disabled { background: #241f2b; color: #9389a2; cursor: default; }
 .actions button:enabled:hover, .primary:hover { border-color: var(--purple); }
 .actions #like:enabled, .primary { background: #ad91ed; color: #191123; }
+.actions #dislike[aria-busy="true"] { background: #603442; color: #ffe0e8; cursor: wait; }
+.actions #like[aria-busy="true"] { background: #cbb5ff; cursor: wait; }
 .primary { display: inline-block; padding: 10px 16px; margin-top: 14px; }
-#status { margin: 0; text-align: center; font-size: 14px; }
-#status:empty { display: none; }
+#status { min-height: 1.5em; margin: 0; text-align: center; font-size: 14px; }
 
 body:has(#browse:not([hidden])) {
   display: grid;

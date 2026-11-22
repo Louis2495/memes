@@ -107,7 +107,7 @@ function render(message) {
   }
   controls.forEach((id) => {
     const canGoBack = id === 'previous' && !good;
-    element(id).disabled = busy || (canGoBack ? index === 0 : !current);
+    element(id).disabled = canGoBack ? index === 0 : !current;
   });
 }
 
@@ -133,7 +133,11 @@ async function vote(reaction) {
   }
 
   busy = true;
-  render();
+  const button = element(reaction);
+  button.setAttribute('aria-busy', 'true');
+  const removing = reaction === 'dislike' && (session?.admin || (staticHost && !hosted));
+  element('status').textContent = removing ? 'Removing meme…'
+    : reaction === 'like' ? 'Saving like…' : 'Saving dislike…';
   try {
     let result = { deleted: false };
     if (hosted && session?.admin && reaction === 'dislike') {
@@ -166,6 +170,7 @@ async function vote(reaction) {
     if (error.status === 404) removeCurrent();
     element('status').textContent = hosted ? 'Could not update this meme. Try again.' : staticHost ? 'Could not save your vote in this browser.' : error.message;
   } finally {
+    button.removeAttribute('aria-busy');
     busy = false;
     render();
   }
