@@ -15,7 +15,7 @@ The controls also work by click or tap. The feed shuffles unseen memes, remember
 
 The current catalog includes a hand-reviewed selection of finished memes from [Dank Meme Paradise](https://github.com/Silent-dawn/Dank_Meme_Paradise), [SeansLifeArchive Images Memes](https://github.com/seanpm2001/SeansLifeArchive_Images_Memes), and [programming-memes](https://github.com/dpnkrpl/programming-memes).
 
-Some entries restore captions from published posts in the [ImgFlip575K archive](https://github.com/schesa/ImgFlip575K_Dataset) on their corresponding templates. Each restored entry keeps the original post URL. Review every finished image before adding it to the catalog. Look for sharp satire, dark or absurd humor, and funny exchanges in posts and replies. Exclude the Back in My Day, Philosoraptor, and Bad Luck Brian templates. Leave unreviewed batches out of the catalog.
+Some entries restore captions from published posts in the [ImgFlip575K archive](https://github.com/schesa/ImgFlip575K_Dataset) on their corresponding templates. Each restored entry keeps the original post URL. Review every finished image before adding it to the catalog. Look for sharp satire, dark or absurd humor, and funny exchanges in posts and replies. Exclude the Back in My Day, Philosoraptor, and Bad Luck Brian templates. Exclude images that mention coronavirus or COVID-19. Leave unreviewed batches out of the catalog.
 
 ## Run locally
 
