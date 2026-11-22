@@ -64,8 +64,6 @@ h2 { margin: 16px 0 0; letter-spacing: -.04em; }
 .actions button:enabled:hover, .primary:hover { border-color: var(--purple); }
 .actions #like:enabled, .primary { background: #ad91ed; color: #191123; }
 .primary { display: inline-block; padding: 10px 16px; margin-top: 14px; }
-.shortcuts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px; margin-top: 18px; color: var(--muted); font-size: 12px; }
-kbd { display: inline-block; min-width: 22px; padding: 2px 4px; text-align: center; border: 1px solid var(--line); background: var(--surface); border-radius: 5px; }
 #status { margin: 0; text-align: center; font-size: 14px; }
 #status:empty { display: none; }
 
@@ -85,7 +83,7 @@ body:has(#browse:not([hidden])) main {
 }
 #browse {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(6px, 1vh, 12px);
   min-height: 0;
 }
@@ -97,7 +95,6 @@ body:has(#browse:not([hidden])) main {
   grid-template-rows: auto minmax(0, 1fr) auto;
   min-height: 0;
 }
-#browse .shortcuts { margin: 0; }
 
 @media (max-height: 620px) {
   .top { min-height: 48px; }
@@ -109,9 +106,6 @@ body:has(#browse:not([hidden])) main {
   #empty { padding: 8px; }
   #empty .empty-icon { width: 36px; height: 36px; border-radius: 12px; font-size: 25px; }
   #empty h2 { margin-top: 5px; }
-}
-@media (max-height: 410px) {
-  #browse .shortcuts { display: none; }
 }
 .signin { max-width: 480px; margin: auto; padding: 46px 20px; text-align: center; }
 .signin h1 { margin-top: 18px; }

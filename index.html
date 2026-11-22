@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#121016">
   <title>Meme Room</title>
-  <link rel="stylesheet" href="./public/style.css?v=10">
-  <script type="module" src="./public/app.js?v=15"></script>
+  <link rel="stylesheet" href="./public/style.css?v=11">
+  <script type="module" src="./public/app.js?v=16"></script>
 </head>
 <body>
   <header class="top">
@@ -37,13 +37,12 @@
           <img id="meme" alt="" hidden>
         </div>
         <div class="actions" aria-label="Meme controls">
-          <button id="previous" aria-label="Previous meme" title="Previous meme (up arrow)" disabled>↑</button>
-          <button id="dislike" aria-label="Dislike" title="Dislike (left arrow)" disabled>← <span>Dislike</span></button>
-          <button id="like" aria-label="Like" title="Like (right arrow)" disabled><span>Like</span> →</button>
-          <button id="next" aria-label="Next meme" title="Next meme (down arrow)" disabled>↓</button>
+          <button id="previous" aria-label="Previous meme" disabled>↑</button>
+          <button id="dislike" aria-label="Dislike" disabled>← <span>Dislike</span></button>
+          <button id="like" aria-label="Like" disabled><span>Like</span> →</button>
+          <button id="next" aria-label="Next meme" disabled>↓</button>
         </div>
       </article>
-      <div class="shortcuts"><span><kbd>↑</kbd> Previous</span><span><kbd>←</kbd> <span id="left-shortcut">Dislike</span></span><span><kbd>→</kbd> Like</span><span><kbd>↓</kbd> Next</span></div>
       <p id="status" role="status"></p>
     </section>
     <section id="signin" class="signin card" hidden>

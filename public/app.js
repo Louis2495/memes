@@ -202,9 +202,7 @@ element('sign-out').onclick = async () => {
 function setLeftAction(label, description) {
   const button = element('dislike');
   button.setAttribute('aria-label', description);
-  button.title = description + ' (left arrow)';
   button.querySelector('span').textContent = label;
-  element('left-shortcut').textContent = label;
 }
 
 async function loadHostedAccount() {
