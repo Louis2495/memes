@@ -58,7 +58,7 @@ p { color: var(--muted); line-height: 1.5; }
 .empty-icon { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--raised); color: var(--purple); font-size: 39px; }
 h2 { margin: 16px 0 0; letter-spacing: -.04em; }
 #empty-description { margin: 7px 0 0; }
-.actions { display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; gap: 8px; margin-top: 12px; }
+.actions { display: grid; grid-template-columns: 1fr 2fr 2fr 2fr 1fr; gap: 8px; margin-top: 12px; }
 .actions button, .primary { background: var(--raised); border: 1px solid transparent; border-radius: 10px; padding: 10px 5px; cursor: pointer; color: var(--purple); font-weight: 750; }
 .actions button:disabled { background: #241f2b; color: #9389a2; cursor: default; }
 .actions button:enabled:hover, .primary:hover { border-color: var(--purple); }
@@ -120,4 +120,18 @@ body:has(#browse:not([hidden])) main {
   .top { gap: 5px; padding-inline: 9px; }
   nav a, .account { padding: 7px 6px; font-size: 13px; }
   .account span { display: none; }
+}
+
+.actions.picks { grid-template-columns: 1fr 3fr 1fr; }
+.actions #super-like[aria-pressed="true"] { background: #ebc66e; color: #201728; }
+#export-picks {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+}
+@media (max-width: 360px) {
+  .brand { font-size: 14px; }
+  nav a, .account { padding-inline: 4px; }
 }

@@ -2,9 +2,9 @@ import { connectEmailAuth } from './email-auth.js?v=1';
 
 const element = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-const view = ['good', 'signin'].includes(params.get('view')) ? params.get('view') : 'feed';
+const view = ['good', 'super', 'signin'].includes(params.get('view')) ? params.get('view') : 'feed';
 const staticHost = document.documentElement.dataset.host === 'static';
-const controls = ['previous', 'dislike', 'like', 'next'];
+const controls = ['previous', 'dislike', 'like', 'super-like', 'next'];
 let session;
 let hosted;
 let memes = [];
@@ -15,6 +15,7 @@ let previouslySeen = 0;
 const seenOnThisPage = new Set();
 
 const voteKey = (id) => `meme-room:vote:${id}`;
+const superLikeKey = (id) => `meme-room:super-like:${id}`;
 const removedKey = (id) => `meme-room:removed:${id}`;
 
 async function request(path, options) {
@@ -101,36 +102,43 @@ function removeCurrent() {
 function render(message) {
   const current = memes[index];
   const good = view === 'good';
+  const picks = view === 'super';
   const caughtUp = view === 'feed' && !current && feedTotal > 0;
   const needsSignIn = good && !staticHost && !session?.email;
-  const position = good ? index + 1 : previouslySeen + index + 1;
-  const total = good ? memes.length : feedTotal;
+  const position = good || picks ? index + 1 : previouslySeen + index + 1;
+  const total = good || picks ? memes.length : feedTotal;
   element('position').textContent = current ? `${position} / ${total}` : caughtUp ? `${total} / ${total}` : '— / —';
   element('empty').hidden = Boolean(current);
   element('meme').hidden = !current;
   if (current) {
     const image = element('meme');
     image.alt = current.alt ?? current.title;
-    const source = staticHost ? new URL(`memes/${current.image}`, import.meta.url).href : `/api/memes/${current.id}/image`;
+    const source = imageUrl(current);
     if (image.getAttribute('src') !== source) image.src = source;
   } else {
     element('meme').removeAttribute('src');
     element('empty-title').textContent = caughtUp ? 'You’re caught up'
-      : needsSignIn ? 'Your likes live here' : good ? 'Nothing saved yet' : 'No memes yet';
+      : picks ? 'No Super Likes yet' : needsSignIn ? 'Your likes live here' : good ? 'Nothing saved yet' : 'No memes yet';
     element('empty-description').textContent = message ?? (caughtUp ? 'New memes will appear here when they’re added.'
       : needsSignIn ? 'Sign in to see the memes you’ve liked.'
+      : picks ? 'Use Super Like to save memes as references.'
       : good ? 'Like a meme in the feed to save it here.' : 'Check back when the first memes drop.');
     element('empty-action').hidden = !needsSignIn;
   }
+  const starred = Boolean(current && hasStoredFlag(superLikeKey(current.id)));
+  const star = element('super-like');
+  star.setAttribute('aria-pressed', String(starred));
+  star.querySelector('span').textContent = starred ? 'Starred' : 'Super Like';
+  element('export-picks').hidden = !picks || !memes.length;
   controls.forEach((id) => {
-    const canGoBack = id === 'previous' && !good;
+    const canGoBack = id === 'previous' && view === 'feed';
     element(id).disabled = canGoBack ? index === 0 : !current;
   });
 }
 
 function move(offset) {
   if (busy || !memes.length) return;
-  if (view === 'good') index = (index + offset + memes.length) % memes.length;
+  if (view !== 'feed') index = (index + offset + memes.length) % memes.length;
   else if (offset < 0) index = Math.max(0, index - 1);
   else if (index < memes.length) advance();
   element('status').textContent = '';
@@ -139,7 +147,7 @@ function move(offset) {
 
 async function vote(reaction) {
   const current = memes[index];
-  if (!current || busy) return;
+  if (!current || busy || view === 'super') return;
   if (!staticHost && !session) {
     element('status').textContent = 'Checking sign-in. Try again in a moment.';
     return;
@@ -192,6 +200,45 @@ async function vote(reaction) {
     render();
   }
 }
+
+function imageUrl(meme) {
+  return staticHost ? new URL(`memes/${meme.image}`, import.meta.url).href
+    : new URL(`/api/memes/${meme.id}/image`, location.href).href;
+}
+
+element('super-like').onclick = () => {
+  const current = memes[index];
+  if (!current || busy) return;
+  const key = superLikeKey(current.id);
+  try {
+    if (hasStoredFlag(key)) {
+      localStorage.removeItem(key);
+      if (view === 'super') removeCurrent();
+      element('status').textContent = 'Removed from Picks.';
+    } else {
+      localStorage.setItem(key, '1');
+      if (view === 'feed') advance();
+      element('status').textContent = 'Saved to Picks.';
+    }
+  } catch {
+    element('status').textContent = 'Could not save your Super Like.';
+  }
+  render();
+};
+
+element('export-picks').onclick = () => {
+  const references = memes.map((meme) => ({
+    id: meme.id,
+    title: meme.title,
+    image: imageUrl(meme),
+  }));
+  const url = URL.createObjectURL(new Blob([JSON.stringify(references, null, 2)], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'meme-room-picks.json';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
 
 element('previous').onclick = () => move(-1);
 element('next').onclick = () => move(1);
@@ -280,6 +327,15 @@ async function init() {
     element('card-label').textContent = 'YOUR LIKES';
   }
 
+  if (view === 'super') {
+    element('heading').firstChild.textContent = 'Super Likes';
+    element('subtitle').textContent = 'Download these picks to share as references.';
+    element('card-label').textContent = 'YOUR PICKS';
+    element('like').hidden = true;
+    element('dislike').hidden = true;
+    element('super-like').parentElement.classList.add('picks');
+  }
+
   if (staticHost) {
     hosted = await connectEmailAuth();
     if (hosted) await loadHostedAccount();
@@ -290,13 +346,14 @@ async function init() {
       return;
     }
 
-    const catalogRequest = request(new URL('memes/catalog.json?v=49', import.meta.url), { cache: 'no-cache' });
+    const catalogRequest = request(new URL('memes/catalog.json?v=50', import.meta.url), { cache: 'no-cache' });
     const deletionsRequest = hosted ? hosted.rpc('removed_meme_ids') : Promise.resolve({ data: [] });
     const [catalog, removals] = await Promise.all([catalogRequest, deletionsRequest]);
     if (removals.error) throw removals.error;
     const deleted = new Set(removals.data);
     const available = catalog.filter(({ id }) => !deleted.has(id) && !wasRemoved(id));
     if (view === 'good') memes = available.filter(({ id }) => localStorage.getItem(voteKey(id)) === 'like');
+    else if (view === 'super') memes = available.filter(({ id }) => hasStoredFlag(superLikeKey(id)));
     else startFeed(available);
     render();
     return;
@@ -324,7 +381,8 @@ async function init() {
       : params.get('error') ? 'Sign-in didn’t finish. Please try again.' : '';
     return;
   }
-  if (session.email) memes = await request('/api/memes?view=good');
+  if (view === 'super') memes = (await request('/api/memes')).filter(({ id }) => hasStoredFlag(superLikeKey(id)));
+  else if (session.email) memes = await request('/api/memes?view=good');
   render();
 }
 

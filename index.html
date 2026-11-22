@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#121016">
   <title>Meme Room</title>
-  <link rel="stylesheet" href="./public/style.css?v=12">
-  <script type="module" src="./public/app.js?v=56"></script>
+  <link rel="stylesheet" href="./public/style.css?v=13">
+  <script type="module" src="./public/app.js?v=57"></script>
 </head>
 <body>
   <header class="top">
@@ -15,6 +15,7 @@
     <nav aria-label="Main">
       <a href="./" data-view="feed">Feed</a>
       <a href="?view=good" data-view="good">♡ Good</a>
+      <a href="?view=super" data-view="super" aria-label="Super Likes">★ Picks</a>
     </nav>
     <a class="account" id="sign-in" href="?view=signin">Sign in <span aria-hidden="true">↗</span></a>
     <button class="account" id="sign-out" hidden>Sign out</button>
@@ -26,7 +27,7 @@
         <p id="subtitle">Find something worth a laugh.</p>
       </div>
       <article class="card">
-        <div class="card-head"><span id="card-label">THE FEED</span><span id="position">— / —</span></div>
+        <div class="card-head"><span id="card-label">THE FEED</span><button id="export-picks" hidden>Download picks</button><span id="position">— / —</span></div>
         <div class="stage">
           <div id="empty">
             <div class="empty-icon" aria-hidden="true">☻</div>
@@ -40,6 +41,7 @@
           <button id="previous" aria-label="Previous meme" disabled>↑</button>
           <button id="dislike" aria-label="Dislike" disabled>← <span>Dislike</span></button>
           <button id="like" aria-label="Like" disabled><span>Like</span> →</button>
+          <button id="super-like" aria-label="Super Like" aria-pressed="false" disabled>★ <span>Super Like</span></button>
           <button id="next" aria-label="Next meme" disabled>↓</button>
         </div>
       </article>
