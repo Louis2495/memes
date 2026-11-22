@@ -290,7 +290,7 @@ async function init() {
       return;
     }
 
-    const catalogRequest = request(new URL('memes/catalog.json?v=45', import.meta.url), { cache: 'no-cache' });
+    const catalogRequest = request(new URL('memes/catalog.json?v=46', import.meta.url), { cache: 'no-cache' });
     const deletionsRequest = hosted ? hosted.rpc('removed_meme_ids') : Promise.resolve({ data: [] });
     const [catalog, removals] = await Promise.all([catalogRequest, deletionsRequest]);
     if (removals.error) throw removals.error;
