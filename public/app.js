@@ -35,11 +35,17 @@ function hasStoredFlag(key) {
   }
 }
 
-const wasSeen = (id) => hasStoredFlag(seenKey(id));
+function seenAt(id) {
+  try {
+    return Number(localStorage.getItem(seenKey(id))) || 0;
+  } catch {
+    return 0;
+  }
+}
 const wasRemoved = (id) => hasStoredFlag(removedKey(id));
 
 function showFeedMeme(position) {
-  while (memes[position] && !seenOnThisPage.has(memes[position].id) && wasSeen(memes[position].id)) {
+  while (memes[position] && !seenOnThisPage.has(memes[position].id) && seenAt(memes[position].id)) {
     memes.splice(position, 1);
     previouslySeen++;
   }
@@ -49,7 +55,7 @@ function showFeedMeme(position) {
 
   seenOnThisPage.add(current.id);
   try {
-    localStorage.setItem(seenKey(current.id), '1');
+    localStorage.setItem(seenKey(current.id), String(Date.now()));
   } catch {
     // The current page still traverses the shuffled list without replacement.
   }
@@ -57,13 +63,24 @@ function showFeedMeme(position) {
 
 function startFeed(catalog) {
   feedTotal = catalog.length;
-  memes = catalog.filter(({ id }) => !wasSeen(id));
-  previouslySeen = feedTotal - memes.length;
-  for (let last = memes.length - 1; last > 0; last--) {
-    const other = Math.floor(Math.random() * (last + 1));
-    [memes[last], memes[other]] = [memes[other], memes[last]];
+  const history = [];
+  const unseen = [];
+  for (const meme of catalog) {
+    const timestamp = seenAt(meme.id);
+    if (timestamp) {
+      history.push({ meme, timestamp });
+      seenOnThisPage.add(meme.id);
+    } else {
+      unseen.push(meme);
+    }
   }
-  showFeedMeme(0);
+  history.sort((first, second) => first.timestamp - second.timestamp);
+  for (let last = unseen.length - 1; last > 0; last--) {
+    const other = Math.floor(Math.random() * (last + 1));
+    [unseen[last], unseen[other]] = [unseen[other], unseen[last]];
+  }
+  memes = [...history.map(({ meme }) => meme), ...unseen];
+  showFeedMeme(history.length);
 }
 
 function advance() {
@@ -273,7 +290,7 @@ async function init() {
       return;
     }
 
-    const catalogRequest = request(new URL('memes/catalog.json?v=15', import.meta.url), { cache: 'no-cache' });
+    const catalogRequest = request(new URL('memes/catalog.json?v=16', import.meta.url), { cache: 'no-cache' });
     const deletionsRequest = hosted ? hosted.rpc('removed_meme_ids') : Promise.resolve({ data: [] });
     const [catalog, removals] = await Promise.all([catalogRequest, deletionsRequest]);
     if (removals.error) throw removals.error;
