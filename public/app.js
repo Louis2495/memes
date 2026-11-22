@@ -47,7 +47,11 @@ function move(offset) {
 async function vote(reaction) {
   const current = memes[index];
   if (!current || busy) return;
-  if (!session?.email) {
+  if (!session) {
+    element('status').textContent = 'Checking sign-in. Try again in a moment.';
+    return;
+  }
+  if (!session.email) {
     location.assign('/signin');
     return;
   }
@@ -113,16 +117,29 @@ async function init() {
     element('card-label').textContent = 'YOUR LIKES';
   }
 
-  session = await request('/api/session');
-  element('sign-in').hidden = Boolean(session.email);
-  element('sign-out').hidden = !session.email;
+  const loadSession = request('/api/session').then((account) => {
+    session = account;
+    element('sign-in').hidden = Boolean(account.email);
+    element('sign-out').hidden = !account.email;
+  });
+
+  if (view === 'feed') {
+    loadSession.catch(() => {
+      element('status').textContent = 'Could not check sign-in. Refresh to retry.';
+    });
+    memes = await request('/api/memes');
+    render();
+    return;
+  }
+
+  await loadSession;
   if (view === 'signin') {
     element('google').hidden = !session.google;
     element('signin-status').textContent = !session.google ? 'Google sign-in hasn’t been configured yet.'
       : params.get('error') ? 'Sign-in didn’t finish. Please try again.' : '';
     return;
   }
-  if (view === 'feed' || session.email) memes = await request(`/api/memes?view=${view}`);
+  if (session.email) memes = await request('/api/memes?view=good');
   render();
 }
 
