@@ -1,4 +1,6 @@
 import { randomBytes, createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { openDatabase } from './db.js';
@@ -6,6 +8,8 @@ import { openDatabase } from './db.js';
 const adminEmail = 'louisanderson477@gmail.com';
 const token = () => randomBytes(32).toString('hex');
 const hash = (value) => createHash('sha256').update(value).digest('hex');
+const homepage = readFileSync(new URL('./index.html', import.meta.url), 'utf8')
+  .replace('data-host="static"', 'data-host="server"');
 const sessionAge = 7 * 24 * 60 * 60 * 1000;
 
 export function createApp({
@@ -119,6 +123,10 @@ export function createApp({
   app.get('/signin', (req, res) => res.redirect('/?view=signin' + (
     ['failed', 'unconfigured'].includes(req.query.error) ? '&error=' + req.query.error : ''
   )));
-  app.use(express.static(new URL('./public', import.meta.url).pathname, { etag: false, lastModified: false }));
+  app.get('/', (_req, res) => res.type('html').send(homepage));
+  app.use('/public', express.static(fileURLToPath(new URL('./public/', import.meta.url)), {
+    etag: false,
+    lastModified: false,
+  }));
   return app;
 }

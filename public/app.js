@@ -1,6 +1,7 @@
 const element = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const view = ['good', 'signin'].includes(params.get('view')) ? params.get('view') : 'feed';
+const staticHost = document.documentElement.dataset.host === 'static';
 const controls = ['previous', 'dislike', 'like', 'next'];
 let session;
 let memes = [];
@@ -52,7 +53,7 @@ async function vote(reaction) {
     return;
   }
   if (!session.email) {
-    location.assign('/signin');
+    location.assign('?view=signin');
     return;
   }
 
@@ -72,7 +73,7 @@ async function vote(reaction) {
     }
     element('status').textContent = result.deleted ? 'Meme permanently deleted.' : reaction === 'like' ? 'Saved to Good.' : 'Disliked.';
   } catch (error) {
-    if (error.status === 401) location.assign('/signin');
+    if (error.status === 401) location.assign('?view=signin');
     if (error.status === 404) {
       memes.splice(index, 1);
       index %= memes.length || 1;
@@ -115,6 +116,16 @@ async function init() {
     element('heading').firstChild.textContent = 'Good';
     element('subtitle').textContent = 'All the memes you’ve liked.';
     element('card-label').textContent = 'YOUR LIKES';
+  }
+
+  if (staticHost) {
+    if (view === 'signin') {
+      element('signin-status').textContent = 'Google sign-in needs the Meme Room server.';
+    } else {
+      render(view === 'good' ? 'Saved likes are available on the hosted Meme Room app.' : undefined);
+      element('empty-action').hidden = true;
+    }
+    return;
   }
 
   const loadSession = request('/api/session').then((account) => {

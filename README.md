@@ -29,6 +29,12 @@ Create a Google OAuth **Web application** client. Add `http://localhost:3000/aut
 
 Copy `.env.example` to `.env` and fill in `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Set `BASE_URL` to the origin users will visit, then restart the server. If the OAuth app is in testing mode, add the accounts that need access as test users in Google Cloud.
 
+## GitHub Pages
+
+In the repository’s Pages settings, select **Deploy from a branch**, then **main** and **/ (root)**. The Pages URL opens the dark feed from `index.html`.
+
+The Pages site shows the empty feed until a full deployment is available. To use the shared meme library, sign in, vote, or moderate, deploy the Node app using the settings below and open its URL.
+
 ## Deployment
 
 Run one application instance with a persistent writable volume for `data/memes.sqlite`, or set `DB_PATH` to a path on that volume. Set `BASE_URL` to the site's external HTTPS origin so session cookies are secure and sign-in redirects to the right host. Keep credentials and the database out of Git.
